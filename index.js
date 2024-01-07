@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 
 let stores = [];
-const scrapeLogic = async (res) => {
+const scrapeLogic = async () => {
   const browser = await puppeteer.launch({
     args: [
       "--disable-setuid-sandbox",
@@ -67,11 +67,11 @@ const scrapeLogic = async (res) => {
             );
           } catch (error) {}
 
-          stores.push({ city: `${city}`, storename: title, storestatus: tag });
+          stores.push({ city: "kisumu", storename: title, storestatus: tag });
         }
         await page.waitForSelector(".next-page-link", {
           visible: true,
-          timeout: 5000,
+          timeout: 0,
         });
 
         const is_disabled =
@@ -89,16 +89,16 @@ const scrapeLogic = async (res) => {
   } finally {
     await browser.close();
   }
+  app.get("/", (req, res) => {
+    res.send("Render Puppeteer server is up and running!");
+  });
+
+  app.get("/stores", function (req, res) {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.send(stores);
+  });
 };
 
-app.get("/", (req, res) => {
-  res.send("Render Puppeteer server is up and running!");
-});
-
-app.get("/stores", function (req, res) {
-  res.set("Access-Control-Allow-Origin", "*");
-  res.send(stores);
-});
 scrapeLogic();
 
 const PORT = process.env.PORT || 4000;
