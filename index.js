@@ -4,7 +4,7 @@ const app = express();
 const scrapeLogic = async (res) => {
   const browser = await puppeteer.launch({
     defaultViewport: null,
-    headless: false,
+    headless: "new",
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
