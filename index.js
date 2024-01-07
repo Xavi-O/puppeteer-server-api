@@ -4,14 +4,11 @@ const app = express();
 
 const scrapeLogic = async (res) => {
   const browser = await puppeteer.launch({
-    defaultViewport: null,
-    headless: "new",
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
       "--single-process",
       "--no-zygote",
-      "--force-device-scale-factor=0.5",
     ],
     executablePath:
       process.env.NODE_ENV === "production"
