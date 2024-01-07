@@ -35,7 +35,7 @@ const scrapeLogic = async (res) => {
 
     await page.goto(
       "https://glovoapp.com/ke/en/nairobi/kfc-nbo?search=double%20crunch%20burger",
-      {waitUntil: 'domcontentloaded', timeout: 0}
+      {waitUntil: 'networkidle0', timeout: 0}
     );
 
     // Locate the full title with a unique string
