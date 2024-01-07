@@ -9,6 +9,7 @@ const scrapeLogic = async (res) => {
       "--no-sandbox",
       "--single-process",
       "--no-zygote",
+      "--force-device-scale-factor=0.5",
     ],
     executablePath:
       process.env.NODE_ENV === "production"
@@ -17,6 +18,20 @@ const scrapeLogic = async (res) => {
   });
   try {
     const page = await browser.newPage();
+
+    //Prevent from loading images, styles and fonts
+    await page.setRequestInterception(true);
+    page.on("request", (req) => {
+      if (
+        req.resourceType() == "stylesheet" ||
+        req.resourceType() == "font" ||
+        req.resourceType() == "image"
+      ) {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
 
     await page.goto(
       "https://glovoapp.com/ke/en/nairobi/kfc-nbo?search=double%20crunch%20burger",
