@@ -2,6 +2,7 @@ const puppeteer = require("puppeteer");
 const express = require("express");
 const app = express();
 
+let stores = [];
 const scrapeLogic = async (res) => {
   const browser = await puppeteer.launch({
     args: [
@@ -33,35 +34,71 @@ const scrapeLogic = async (res) => {
       }
     });
 
-    await page.goto(
-      "https://glovoapp.com/ke/en/nairobi/kfc-nbo?search=double%20crunch%20burger",
-      {waitUntil: 'networkidle0', timeout: 0}
-    );
-
-    // Locate the full title with a unique string
-    const textSelector = await page.waitForSelector(
-      ".product-row__content > div > div.product-row__name"
-    );
-    const fullTitle = await textSelector.evaluate((el) => el.textContent);
-
-    // Print the full title
-    const logStatement = `The title of this product is ${fullTitle}`;
-    console.log(logStatement);
-    app.get("/scrape", (req, res) => {
-      res.send(logStatement);
+    // Navigate the page to a URL
+    await page.goto("https://glovoapp.com/ke/en/kisumu/restaurants_394/", {
+      waitUntil: "networkidle0",
+      timeout: 0,
     });
-  } catch (e) {
-    console.error(e);
-    app.get("/scrape", (req, res) => {
-      res.send(`Something went wrong while running Puppeteer: ${e}`);
-    });
+
+    try {
+      let isBtnDisabled = false;
+      while (!isBtnDisabled) {
+        await page.waitForSelector(".store-card");
+        const storeNames = await page.$$(".store-card");
+
+        for (const storeName of storeNames) {
+          let title = "Null";
+          let tag = "Open";
+
+          try {
+            title = await page.evaluate(
+              (el) =>
+                el.querySelector(".store-card__footer__title").textContent,
+              storeName
+            );
+          } catch (error) {}
+          try {
+            tag = await page.evaluate(
+              (el) =>
+                el.querySelector(
+                  ".store-card__long-text-prevention > div > div"
+                ).textContent,
+              storeName
+            );
+          } catch (error) {}
+
+          stores.push({ city: `${city}`, storename: title, storestatus: tag });
+        }
+        await page.waitForSelector(".next-page-link", {
+          visible: true,
+          timeout: 5000,
+        });
+
+        const is_disabled =
+          (await page.$(".next-page-link--disabled")) !== null;
+
+        isBtnDisabled = is_disabled;
+
+        if (!is_disabled) {
+          await page.click(".next-page-link");
+          await page.waitForNavigation();
+        }
+      }
+      //console.log(stores.length)
+    } catch (error) {}
   } finally {
     await browser.close();
   }
-  app.get("/", (req, res) => {
-    res.send("Render Puppeteer server is up and running!");
-  });
 };
+
+app.get("/", (req, res) => {
+  res.send("Render Puppeteer server is up and running!");
+});
+
+app.get("/stores", function (req, res) {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.send(stores);
+});
 scrapeLogic();
 
 const PORT = process.env.PORT || 4000;
