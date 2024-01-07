@@ -49,6 +49,8 @@ const scrapeLogic = async (res) => {
       visible: true,
     });
 
+    let product = []
+
     const productHandles = await page.$$(".store__body__dynamic-content");
     for (const productHandle of productHandles) {
       title = await page.evaluate(
@@ -67,6 +69,7 @@ const scrapeLogic = async (res) => {
         productHandle
       );
       console.log(title, price);
+      product.push(title, price);
     }
   } catch (e) {
     console.error(e);
@@ -75,5 +78,5 @@ const scrapeLogic = async (res) => {
     await browser.close();
   }
 };
-
+scrapeLogic();
 module.exports = { scrapeLogic };
