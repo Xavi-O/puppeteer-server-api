@@ -8,44 +8,54 @@ const scrapeLogic = async (res) => {
       "--no-sandbox",
       "--single-process",
       "--no-zygote",
+      "--force-device-scale-factor=0.5",
     ],
     executablePath:
       process.env.NODE_ENV === "production"
         ? process.env.PUPPETEER_EXECUTABLE_PATH
         : puppeteer.executablePath(),
   });
-  try {
-    const page = await browser.newPage();
+  const page = await browser.newPage();
 
-    await page.goto("https://developer.chrome.com/");
+  await page.goto("https://glovoapp.com/ke/en/nairobi/kfc-nbo/", {
+    waitUntil: "networkidle0",
+  });
 
-    // Set screen size
-    await page.setViewport({ width: 1080, height: 1024 });
+  // Set screen size
+  await page.setViewport(null);
 
-    // Type into search box
-    await page.type(".search-box__input", "automate beyond recorder");
-
-    // Wait and click on first result
-    const searchResultSelector = ".search-box__link";
-    await page.waitForSelector(searchResultSelector);
-    await page.click(searchResultSelector);
-
-    // Locate the full title with a unique string
-    const textSelector = await page.waitForSelector(
-      "text/Customize and automate"
-    );
-    const fullTitle = await textSelector.evaluate((el) => el.textContent);
-
-    // Print the full title
-    const logStatement = `The title of this blog post is ${fullTitle}`;
-    console.log(logStatement);
-    res.send(logStatement);
-  } catch (e) {
-    console.error(e);
-    res.send(`Something went wrong while running Puppeteer: ${e}`);
-  } finally {
-    await browser.close();
+  const [search] = await page.$x('//*[@class="search-input"]');
+  if (search) {
+    await search.click();
   }
+
+  let searchText = await page.waitForXPath('//*[@class="search-input__field"]');
+  await searchText.type("ricebliss");
+
+  await page.waitForSelector(".product-row", {
+    visible: true,
+  });
+
+  const productHandles = await page.$$(".store__body__dynamic-content");
+  for (const productHandle of productHandles) {
+    title = await page.evaluate(
+      (el) =>
+        el.querySelector(".product-row__content > div > div.product-row__name")
+          .textContent,
+      productHandle
+    );
+
+    price = await page.evaluate(
+      (el) =>
+        el.querySelector(
+          ".product-price__effective.product-price__effective--new-card"
+        ).textContent,
+      productHandle
+    );
+    console.log(title, price);
+  }
+
+  await browser.close();
 };
 
 module.exports = { scrapeLogic };
