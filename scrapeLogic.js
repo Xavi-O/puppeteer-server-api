@@ -30,7 +30,7 @@ const scrapeLogic = async (res) => {
   }
 
   let searchText = await page.waitForXPath('//*[@class="search-input__field"]');
-  await searchText.type("ricebliss");
+  await searchText.type("doublecrunchburger");
 
   await page.waitForSelector(".product-row", {
     visible: true,
