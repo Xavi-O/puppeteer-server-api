@@ -1,4 +1,4 @@
-const puppeteer = require("puppeteer");
+import puppeteer from 'puppeteer';
 const express = require("express");
 const fs = require("fs").promises;
 const app = express();
@@ -64,7 +64,7 @@ function timeInterval() {
       try {
         let isBtnDisabled = false;
         while (!isBtnDisabled) {
-          await page.waitForSelector(".store-card");
+          await page.waitForSelector(".store-card", {timeout:0});
           const storeNames = await page.$$(".store-card");
 
           for (const storeName of storeNames) {
@@ -72,7 +72,7 @@ function timeInterval() {
             let tag = "Open";
 
             const locationHandles = await page.waitForXPath(
-              '//*[@id="user-address"]'
+              '//*[@id="user-address"]',{timeout:0}
             );
             try {
               location = await page.evaluate(
@@ -109,7 +109,7 @@ function timeInterval() {
           }
           await page.waitForSelector(".next-page-link", {
             visible: true,
-            timeout: 5000,
+            timeout: 0,
           });
 
           const is_disabled =
