@@ -127,8 +127,7 @@ function timeInterval() {
       } catch (error) {}
       await browser.close();
     }
-  })();
-  (async () => {
+
     //Thika Addresses
     let thkAddresses = ["./kenya/thk/thika.json"];
     for (let i = 0; i < thkAddresses.length; i++) {
@@ -171,7 +170,10 @@ function timeInterval() {
       await page.setCookie(...cookies);
 
       // Navigate the page to a URL
-      await page.goto("https://glovoapp.com/ke/en/thika/restaurants_394/");
+      await page.goto("https://glovoapp.com/ke/en/thika/restaurants_394/", {
+        waitUntil: "domcontentloaded",
+        timeout: 0,
+      });
 
       const now = new Date();
       const currentDateTime = now.toLocaleTimeString();
