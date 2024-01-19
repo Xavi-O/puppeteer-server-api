@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+const puppeteer = require ('puppeteer');
 const express = require("express");
 const fs = require("fs").promises;
 const app = express();
