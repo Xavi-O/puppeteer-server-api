@@ -135,18 +135,18 @@ function timeInterval() {
 
       // Launch the browser and open a new blank page
       const browser = await puppeteer.launch({
-      args: [
-        "--disable-setuid-sandbox",
-        "--no-sandbox",
-        "--single-process",
-        "--no-zygote",
-        "--force-device-scale-factor=0.5",
-      ],
-      executablePath:
-        process.env.NODE_ENV === "production"
-          ? process.env.PUPPETEER_EXECUTABLE_PATH
-          : puppeteer.executablePath(),
-    });
+        args: [
+          "--disable-setuid-sandbox",
+          "--no-sandbox",
+          "--single-process",
+          "--no-zygote",
+          "--force-device-scale-factor=0.5",
+        ],
+        executablePath:
+          process.env.NODE_ENV === "production"
+            ? process.env.PUPPETEER_EXECUTABLE_PATH
+            : puppeteer.executablePath(),
+      });
 
       const page = await browser.newPage();
 
@@ -256,6 +256,11 @@ let timer = setTimeout(function myTimer() {
   });
   timer = setTimeout(myTimer, 60 * 60 * 1000);
 }, 1000);
+
+app.get("/", (req, res) => {
+  res.send("Render Puppeteer server is up and running!");
+});
+
 /*
 const scrapeLogic = async () => {
   let cities = [
